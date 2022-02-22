@@ -1,0 +1,105 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0088)https://wrprod01-prod-useast1.mathworks.com/static/jc3IS2z5/MATLAB%20Drive/particle.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge,IE=9,chrome=1"><meta name="generator" content="MATLAB 2021b"><title>Untitled</title><style type="text/css">.rtcContent { padding: 30px; } .CodeBlock { background-color: #F7F7F7; margin: 10px 0 10px 0;}
+.S0 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 1px solid rgb(233, 233, 233); border-bottom: 0px none rgb(0, 0, 0); border-radius: 4px 4px 0px 0px; padding: 6px 45px 0px 13px; line-height: 17.234px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S1 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 0px none rgb(0, 0, 0); border-bottom: 0px none rgb(0, 0, 0); border-radius: 0px; padding: 0px 45px 0px 13px; line-height: 17.234px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }
+.S2 { border-left: 1px solid rgb(233, 233, 233); border-right: 1px solid rgb(233, 233, 233); border-top: 0px none rgb(0, 0, 0); border-bottom: 1px solid rgb(233, 233, 233); border-radius: 0px 0px 4px 4px; padding: 0px 45px 4px 13px; line-height: 17.234px; min-height: 18px; white-space: nowrap; color: rgb(0, 0, 0); font-family: Menlo, Monaco, Consolas, "Courier New", monospace; font-size: 14px;  }</style></head><body><div class="rtcContent"><div class="CodeBlock"><div class="inlineWrapper"><div class="S0"><span style="white-space: pre"><span style="color: rgb(14, 0, 255);">function </span><span>[v_a,T] = simulation(TMAX,N,L,r,noise,vel,es,F,beta)</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>PERIODIC=1; </span><span style="color: rgb(2, 128, 9);">% 1: periodic boundary condition, 0: unlimited</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span style="color: rgb(2, 128, 9);">%% Initial condition</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>dt=1;</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>x = L*rand(1,N);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>y = L*rand(1,N);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>v = vel*ones(1,N);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>theta = 2*pi*(rand(1,N)-0.5); </span><span style="color: rgb(2, 128, 9);">%% randomly direction</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>Phi = zeros(1,TMAX);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span style="color: rgb(2, 128, 9);">% Precision control</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>prs_size = 1;</span><span style="color: rgb(2, 128, 9);">%was 100</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>prs_num = 0.01;</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span style="color: rgb(2, 128, 9);">%% Simulation process</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span style="color: rgb(14, 0, 255);">for </span><span>time = 1:TMAX</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	tmp_x = zeros(1,N);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	tmp_y = zeros(1,N);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	ave_theta = zeros(1,N);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	phi = zeros(1,N);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	D = pdist([x' y'],</span><span style="color: rgb(170, 4, 249);">'euclidean'</span><span>); </span><span style="color: rgb(2, 128, 9);">% Calculation of ...erage angle in the interacting circle</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(2, 128, 9);">% Periodic boundary</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(14, 0, 255);">if </span><span>PERIODIC==1</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		tmp_x(x&lt;r) = L + x(x&lt;r);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		tmp_x(x&gt;L-r) = x(x&gt;L-r)-L;</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		tmp_x(r&lt;=x &amp; x&lt;=L-r) = x(r&lt;=x &amp; x&lt;=L-r);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		tmp_y(y&lt;r) = L + y(y&lt;r);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		tmp_y(y&gt;L-r) = y(y&gt;L-r)-L;</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		tmp_y(r&lt;=y &amp; y&lt;=L-r) = y(r&lt;=y &amp; y&lt;=L-r);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		tmp_D = pdist([tmp_x' tmp_y'],</span><span style="color: rgb(170, 4, 249);">'euclidean'</span><span>);</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		D = min([D; tmp_D]);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(14, 0, 255);">end</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	M = squareform(D); </span><span style="color: rgb(2, 128, 9);">% Matrix representation for the ...distance between particles</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(14, 0, 255);">if </span><span>~isempty(F), M = M.*limitView(F,theta,x,y,N); </span><span style="color: rgb(14, 0, 255);">end ...</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(2, 128, 9);">% delete the points outside the vision angle omega</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(2, 128, 9);">% calculation of average directions</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	[l1,l2] = find(0&lt;=M &amp; M&lt;r);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>    </span><span style="color: rgb(2, 128, 9);">%print(l1);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(14, 0, 255);">for </span><span>i = 1:N</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		list = l1(l2==i);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		ave_theta(i) = </span><span style="color: rgb(14, 0, 255);">...</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		atan2(mean(sin(theta(list))),mean(cos(theta(list))));</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		</span><span style="color: rgb(14, 0, 255);">if </span><span>~isempty(beta)</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		xx = sum(v(list).*cos(theta(list)));</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		yy = sum(v(list).*sin(theta(list)));</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		phi(i) = ((xx.^2) + (yy.^2)).^0.5 ./ sum(v(list));</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>		</span><span style="color: rgb(14, 0, 255);">end</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(14, 0, 255);">end</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span style="color: rgb(2, 128, 9);">	%% Update</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	x = x + v.*cos(theta).*dt;</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	y = y + v.*sin(theta).*dt;</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(14, 0, 255);">if </span><span>PERIODIC==1</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	x(x&lt;0) = L + x(x&lt;0);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	x(L&lt;x) = x(L&lt;x) - L;</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	y(y&lt;0) = L + y(y&lt;0);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	y(L&lt;y) = y(L&lt;y) - L;</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(14, 0, 255);">end</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(2, 128, 9);">% update directions</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	theta = ave_theta + noise'.*(rand(1,N) - 0.5);</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(2, 128, 9);">% update speeds</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(14, 0, 255);">if </span><span>~isempty(beta), v = vel.*exp(beta.*(phi - 1)); </span><span style="color: rgb(14, 0, 255);">end</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span style="color: rgb(2, 128, 9);">	%% Compute the normalized average velocity</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	vel_x = sum(v.*cos(theta));</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	vel_y = sum(v.*sin(theta));</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	Phi(time) = ((vel_x.^2) + (vel_y^2)).^0.5 ./ sum(v);</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(14, 0, 255);">if </span><span>time&gt;=prs_size</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	conv_Phi = Phi(time-prs_size+1:time);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(14, 0, 255);">if </span><span>(max(conv_Phi)-min(conv_Phi)&lt;prs_num) &amp;&amp; </span><span style="color: rgb(14, 0, 255);">...</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	(es==1), </span><span style="color: rgb(14, 0, 255);">break</span><span>, </span><span style="color: rgb(14, 0, 255);">end</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>	</span><span style="color: rgb(14, 0, 255);">end</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span style="color: rgb(14, 0, 255);">end</span></span></div></div><div class="inlineWrapper"><div class="S1"></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span style="color: rgb(14, 0, 255);">if </span><span>es==1</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>v_a = mean(conv_Phi);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>conv_ctr = abs(normalize(conv_Phi,</span><span style="color: rgb(170, 4, 249);">'center'</span><span>));</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>I = find(conv_ctr==min(conv_ctr), 1 );</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>T = time-prs_size+I;</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span style="color: rgb(14, 0, 255);">else</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>v_a = Phi(end);</span></span></div></div><div class="inlineWrapper"><div class="S1"><span style="white-space: pre"><span>T=NaN;</span></span></div></div><div class="inlineWrapper"><div class="S2"><span style="white-space: pre"><span style="color: rgb(14, 0, 255);">end</span></span></div></div></div>
+<br>
+<!-- 
+##### SOURCE BEGIN #####
+function [v_a,T] = simulation(TMAX,N,L,r,noise,vel,es,F,beta)
+
+
+PERIODIC=1; % 1: periodic boundary condition, 0: unlimited
+
+%% Initial condition
+dt=1;
+x = L*rand(1,N);
+y = L*rand(1,N);
+v = vel*ones(1,N);
+theta = 2*pi*(rand(1,N)-0.5); %% randomly direction
+Phi = zeros(1,TMAX);
+% Precision control
+prs_size = 1;%was 100
+prs_num = 0.01;
+
+%% Simulation process
+for time = 1:TMAX
+	tmp_x = zeros(1,N);
+	tmp_y = zeros(1,N);
+	ave_theta = zeros(1,N);
+	phi = zeros(1,N);
+	D = pdist([x' y'],'euclidean'); % Calculation of ...erage angle in the interacting circle
+
+	% Periodic boundary
+	if PERIODIC==1
+		tmp_x(x<r) = L + x(x<r);
+		tmp_x(x>L-r) = x(x>L-r)-L;
+		tmp_x(r<=x & x<=L-r) = x(r<=x & x<=L-r);
+		tmp_y(y<r) = L + y(y<r);
+		tmp_y(y>L-r) = y(y>L-r)-L;
+		tmp_y(r<=y & y<=L-r) = y(r<=y & y<=L-r);
+		tmp_D = pdist([tmp_x' tmp_y'],'euclidean');
+
+		D = min([D; tmp_D]);
+	end
+
+	M = squareform(D); % Matrix representation for the ...distance between particles
+	if ~isempty(F), M = M.*limitView(F,theta,x,y,N); end ...
+	% delete the points outside the vision angle omega
+
+	% calculation of average directions
+	[l1,l2] = find(0<=M & M<r);
+    %print(l1);
+	for i = 1:N
+		list = l1(l2==i);
+		ave_theta(i) = ...
+		atan2(mean(sin(theta(list))),mean(cos(theta(list))));
+		if ~isempty(beta)
+		xx = sum(v(list).*cos(theta(list)));
+		yy = sum(v(list).*sin(theta(list)));
+		phi(i) = ((xx.^2) + (yy.^2)).^0.5 ./ sum(v(list));
+		end
+	end
+
+	%% Update
+	x = x + v.*cos(theta).*dt;
+	y = y + v.*sin(theta).*dt;
+
+	if PERIODIC==1
+	x(x<0) = L + x(x<0);
+	x(L<x) = x(L<x) - L;
+	y(y<0) = L + y(y<0);
+	y(L<y) = y(L<y) - L;
+	end
+
+	% update directions
+	theta = ave_theta + noise'.*(rand(1,N) - 0.5);
+
+	% update speeds
+	if ~isempty(beta), v = vel.*exp(beta.*(phi - 1)); end
+
+	%% Compute the normalized average velocity
+	vel_x = sum(v.*cos(theta));
+	vel_y = sum(v.*sin(theta));
+	Phi(time) = ((vel_x.^2) + (vel_y^2)).^0.5 ./ sum(v);
+
+	if time>=prs_size
+	conv_Phi = Phi(time-prs_size+1:time);
+	if (max(conv_Phi)-min(conv_Phi)<prs_num) && ...
+	(es==1), break, end
+	end
+end
+
+if es==1
+v_a = mean(conv_Phi);
+conv_ctr = abs(normalize(conv_Phi,'center'));
+I = find(conv_ctr==min(conv_ctr), 1 );
+T = time-prs_size+I;
+else
+v_a = Phi(end);
+T=NaN;
+end
+##### SOURCE END #####
+-->
+</div></body></html>
